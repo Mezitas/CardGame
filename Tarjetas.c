@@ -20,9 +20,10 @@ void mostrarMatriz(int matriz[4][4]);
 void aleatorizarVector(int vector[16]);
 
 void empezarJuego();
-void interfaz(int matriz[4][4]);
 void mostrarOcultarMatriz(int matriz[4][4]);
 void mostrarMatrizOculta();
+int coordenadaY();
+int coordenadaX();
 void itzMenu1();
 void itzMenu2();
 
@@ -67,17 +68,14 @@ void aleatorizarVector(int vector[16]){
 
 void empezarJuego(){
 	int matriz[4][4] = {0};
+	int intentos = 0;
 	rellenarMatriz(matriz);
 	itzMenu1();
 	mostrarOcultarMatriz(matriz);
 }
-void interfaz(int matriz[4][4]){
-	itzMenu1();
-	itzMenu2();
-}
 void mostrarOcultarMatriz(int matriz[4][4]){
-	for(int i = 0; i < 4; i++){
-		printf("Volteando tarjetas en %d...\n", 4 - i);
+	for(int i = 0; i < 5; i++){
+		printf("Volteando tarjetas en %d...\n", 5 - i);
 		mostrarMatriz(matriz);
 		sleep(1);
 		system("cls");
@@ -103,6 +101,18 @@ void itzMenu1(){
 	system("cls");
 }
 void itzMenu2(){
-	printf("Ingrese las coordenadas de la primera tarjeta (fila y columna)\n");
+	printf("Ingrese las coordenadas de la tarjeta (fila y columna)\n");
 	mostrarMatrizOculta();
+}
+int coordenadaY(){
+	int coordenadaY;
+	printf("Ingrese la columna de la tarjeta: ");
+	scanf("%d", &coordenadaY);
+	return coordenadaY;
+}
+int coordenadaX(){
+	int coordenadaX;
+	printf("Ingrese la fila de la tarjeta: ");
+	scanf("%d", &coordenadaX);
+	return coordenadaX;
 }
