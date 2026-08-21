@@ -149,18 +149,18 @@ int coordenadaX(){
 int verificarX(){
 	int x = coordenadaX();
 	if(x < 0 || x > 3){
-		printf("Coordenada en X invalida, ingrese un numero entre 1 y 4\n");
+		printf("Coordenada en X invalida, ingrese un numero entre 0 y 3\n");
 		return verificarX();
 	}
-	return x-1;
+	return x;
 }
 int verificarY(){
 	int y = coordenadaY();
 	if(y < 0 || y > 3){
-		printf("Coordenada en Y invalida, ingrese un numero entre 1 y 4\n");
+		printf("Coordenada en Y invalida, ingrese un numero entre 0 y 3\n");
 		return verificarY();
 	}
-	return y-1;
+	return y;
 }
 int encontrar(int x, int y, int xAnterior, int yAnterior, int matriz[4][4]){
 	if(matriz[x][y] != matriz[xAnterior][yAnterior]){
