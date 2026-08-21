@@ -23,14 +23,16 @@ void empezarJuego();
 void mostrarOcultarMatriz(int matriz[4][4]);
 void mostrarMatrizOculta();
 void organizarVector(int vector[16]);
-void mostrarEntcontrado(int matriz[4][4], int x[16], int y[16]);
 int coordenadaY();
 int coordenadaX();
 int verificarX();
 int verificarY();
 void itzMenu1();
-void itzMenu2();
-
+void itzMenu2(int matriz[4][4], int intentos);
+void descurbrirPosiciones(int x, int y, int matriz[4][4]);
+int encontrar(int x, int y, int xAnterior, int yAnterior, int matriz[4][4]);
+int terminado(int matriz[4][4]);
+int yaEncontrado(int x, int y, int matriz[4][4]);
 
 int main (int argc, char *argv[]){
 	empezarJuego();
@@ -61,7 +63,7 @@ void aleatorizarVector(int vector[16]){
 	int temp = 0;
 	int random = 0;
 	int random2 = 0;
-	for (int i = 0; i<16; i++){
+	for (int i = 0; i < 16; i++){
 		random = rand() % 16;
 		random2 = rand() % 16;
 		temp = vector[random];
@@ -69,15 +71,46 @@ void aleatorizarVector(int vector[16]){
 		vector[random2] = temp; 
 	}
 }
-
 void empezarJuego(){
-	int matriz[4][4] = {0};
-	int vectorPosicionesX[16] = {-1};
-	int vectorPosicionesY[16] = {-1};
+	int matrizInicial[4][4] = {0};
+	int matrizEncontrar[4][4] = {0};
+	int coorX = 0;
+	int coorY = 0;
+	int coorYAnterior = 0;
+	int coorXAnterior = 0;
+	int noCarta = 0;
 	int intentos = 0;
-	rellenarMatriz(matriz);
+	rellenarMatriz(matrizInicial);
 	itzMenu1();
-	mostrarOcultarMatriz(matriz);
+	mostrarOcultarMatriz(matrizInicial);
+	while(intentos < 3){
+		itzMenu2(matrizEncontrar, intentos);
+		coorX = verificarX();
+		coorY = verificarY();
+		if(yaEncontrado(coorX, coorY, matrizEncontrar) == 0){
+			matrizEncontrar[coorX][coorY] = matrizInicial[coorX][coorY];
+			noCarta++;
+			if(noCarta == 1){
+				coorXAnterior = coorX;
+				coorYAnterior = coorY;
+			}else if(noCarta == 2){
+				intentos += encontrar(coorX, coorY, coorXAnterior, coorYAnterior, matrizEncontrar);
+				noCarta = 0;
+			}
+		}
+		
+		if(terminado(matrizEncontrar) == 1){
+			intentos = 10;
+			system("cls");
+			printf("\n\nFelicidades, ganaste!\n");
+			sleep(3);
+			return;
+		}
+	}
+	if(intentos >= 3){
+		printf("\n\nSe acaboooo, perdiste todos tus intentos...\n");
+		system("pause");
+	}
 }
 void mostrarOcultarMatriz(int matriz[4][4]){
 	for(int i = 0; i < 5; i++){
@@ -87,32 +120,7 @@ void mostrarOcultarMatriz(int matriz[4][4]){
 		system("cls");
 	}
 }
-void mostrarMatrizOculta(){
-	printf("=====MATRIZ=====\n");
-	for(int i = 0; i < 4; i++){
-		for(int j = 0; j < 4; j++){
-			printf("|");
-			printf("*");
-		}
-		printf("\n");
-		printf("----------------\n");
-	}
-}
-void mostrarEntcontrado(int matriz[4][4], int x[16], int y[16]){
-	printf("=====MATRIZ=====\n");
-	for(int i = 0; i < 4; i++){
-		for(int j = 0; j < 4; j++){
-			printf("|");
-			if(i == x[i*4 + j] && j == y[i*4 + j]){
-				printf("%d", matriz[i][j]);
-			}else{
-				printf("*");
-			}
-		}
-		printf("\n");
-		printf("----------------\n");
-	}
-}
+
 void itzMenu1(){
 	printf("Bienvenido al juego de tarjetas\n");
 	printf("El objetivo del juego es encontrar todos los pares de tarjetas\n");
@@ -121,9 +129,10 @@ void itzMenu1(){
 	system("pause");
 	system("cls");
 }
-void itzMenu2(){
+void itzMenu2(int matriz[4][4], int intentos){
+	printf("\n\nNumero de intentos: %d\n\n",3-intentos);
 	printf("Ingrese las coordenadas de la tarjeta (fila y columna)\n");
-	mostrarMatrizOculta();
+	mostrarMatriz(matriz);
 }
 int coordenadaY(){
 	int coordenadaY;
@@ -140,32 +149,42 @@ int coordenadaX(){
 int verificarX(){
 	int x = coordenadaX();
 	if(x < 0 || x > 3){
-		printf("Coordenada invalida, ingrese un numero entre 0 y 3\n");
-		verificarX();
+		printf("Coordenada en X invalida, ingrese un numero entre 1 y 4\n");
+		return verificarX();
 	}
-	return x;
+	return x-1;
 }
 int verificarY(){
 	int y = coordenadaY();
 	if(y < 0 || y > 3){
-		printf("Coordenada invalida, ingrese un numero entre 0 y 3\n");
-		verificarY();
+		printf("Coordenada en Y invalida, ingrese un numero entre 1 y 4\n");
+		return verificarY();
 	}
-	return y;
+	return y-1;
 }
-void organizarVector(int vector[16]){
-	int temp = 0;
-	for(int i = 0; i < 16; i++){
-		for(int j = 0; j < 16; j++){
-			if(vector[i] < vector[j]){
-				temp = vector[i];
-				vector[i] = vector[j];
-				vector[j] = temp;
+int encontrar(int x, int y, int xAnterior, int yAnterior, int matriz[4][4]){
+	if(matriz[x][y] != matriz[xAnterior][yAnterior]){
+		matriz[x][y] = 0;
+		matriz[xAnterior][yAnterior] = 0;
+		printf("\n\nCarta incorrecta, intente de nuevo\n\n");
+		return 1;
+	}
+	return 0;
+}
+int terminado(int matriz[4][4]){
+	for(int i = 0; i < 4; i++){
+		for(int j = 0; j < 4; j++){
+			if(matriz[i][j] == 0){
+				return 0;
 			}
 		}
 	}
+	return 1;
 }
-void moverPosiciones(int x[16], int y[16], int posX, int posY, int index){
-	x[index] = posX;
-	y[index] = posY;
+int yaEncontrado(int x, int y, int matriz[4][4]){
+	if(matriz[x][y] != 0){
+		printf("La tarjeta ya fue encontrada, ingrese otra coordenada\n");
+		return 1;
+	}
+	return 0;
 }
